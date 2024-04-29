@@ -9,7 +9,7 @@ if (isset($_POST['simpan'])) {
     $id_menus = $array[0];
     $price = $array[1];
     $amount = $_POST['amount'];
-    $note = $_SESSION['note'];
+    $note = $_POST['note'];
 
     try {
         if ($id) {
@@ -28,10 +28,11 @@ if (isset($_POST['simpan'])) {
 
         }
         $result = mysqli_query($db, $sql);
+
         if ($result) {
-            header("Location: add.php?success=eksekusi suksess");
+            header("Location: add.php?success=eksekusi suksess" . "&id=$id_receipts");
         } else {
-            header("Location: add.php?error=error_add");
+            header("Location: add.php?error=error_add" . "&id=$id_receipts");
 
         }
     } catch (Exception $exception) {

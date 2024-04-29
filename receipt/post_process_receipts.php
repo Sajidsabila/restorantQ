@@ -23,6 +23,9 @@ if (isset($_POST['simpan'])) {
         }
 
         $result = mysqli_query($db, $sql);
+        if (!$id) {
+            $id = mysqli_insert_id($db);
+        }
         if ($result) {
 
             header("Location: add.php?success=eksekusi suksess&recipt_id= " . "&id=$id");
