@@ -6,15 +6,16 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="username" class="form-label">Customer</label>
-                    <input type="text" class="form-control" id="name" name="name" required 
+                    <input type="text" class="form-control" id="name" 
+                    name="name" required 
                     value=<?= $receipts ? $receipts['customer_name'] : ''; ?>>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Status</label>
                     <select class="form-select" aria-label="Default select example" name="status">
-                        <option value="Entry" name="Entry" <?= $id ? $receipts['status'] == 'Entry' ? 'selected' : '' : '' ?>>
+                        <option value="Entry" name="Entry" <?= $receipts ? $receipts['status'] == 'Entry' ? 'selected' : '' : '' ?>>
                             Entry</option>
-                        <option value="Done" name="Entry" <?= $id ? '' : 'hidden'; ?> <?= $id ? $receipts['status'] == 'Done' ? 'selected' : '' : '' ?>>Done</option>
+                        <option value="Done" name="Entry" <?= $id ? '' : 'hidden'; ?> <?= $receipts ? $receipts['status'] == 'Done' ? 'selected' : '' : '' ?>>Done</option>
                     </select>
                 </div>
 

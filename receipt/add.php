@@ -5,7 +5,7 @@ $query = "SELECT * from receipts where id = '$id'";
 $sql = mysqli_query($db, $query);
 
 $receipts = $sql->num_rows > 0 ? mysqli_fetch_assoc($sql) : null;
-$query = "select rd.id, m.name, rd.id, rd.receipt_id, m.name as menu, c.name as categori,
+$query = "select rd.id, m.name, rd.menu_id, rd.receipt_id, m.name as menu, c.name as categori,
                     rd.note, concat('Rp ', format(sum(rd.price),0 )) as price, rd.amount,
                     concat('Rp ', format(sum(rd.price * rd.amount), 0))
                     as total from  receipt_details as rd join menus as m on
@@ -53,7 +53,7 @@ $receipt_details = mysqli_query($db, $query);
                                 <input type="hidden" name="id">
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Nama Menu</label>
-                                    <select name="nameMenus" class="form-control">
+                                    <select id="select2-modal" name="nameMenus" class="form-control">
                                         <?php
 
                                         $sql = "SELECT id, name, format((price), 0) as harga, price
@@ -127,13 +127,19 @@ $receipt_details = mysqli_query($db, $query);
                             <td><?php echo $receipt_detail['total'] ?></td>
                             <td>
                                 <div class="d-flex">
-                                    <form action="delete.php" method="post">
-                                        <input type="hidden" name="id" value="<?= $data["id"]; ?>">
+                                    <form action="delete_details.php" method="post">
+                                        <input type="hidden" name="id" value="<?= $receipt_detail["id"]; ?>">
+                                        <input type="hidden" name="receipt_id" value="<?= $id; ?>">
                                         <button type="submit" name="submit"
                                             onclick="return confirm('Anda yakin menghapus data ini?');"
                                             class="btn btn-danger btn-sm">Delete</button>
                                     </form>
-                                    <a href="form.php?id=<?= $data['id']; ?>" class="btn btn-warning btn-sm ms-2">Edit</a>
+                                    <button type="button"
+                                        onclick="edit('<?php echo $receipt_detail['id'] ?>,<?php echo $receipt_detail['menu_id'] ?>, <?php echo $receipt_detail['note'] ?>,<?php echo $receipt_detail['amount'] ?>')"
+                                        class="btn btn-warning btn-sm ms-1" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal">
+                                        Edit
+                                    </button>
                             </td>
             </div>
             </tr>

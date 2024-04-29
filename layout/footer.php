@@ -10,6 +10,15 @@
 
     });
 </script>
+<script>
+    function edit(id, menuId, note, amount) {
+        document.getElementsByName('id')[0].value = id;
+        document.getElementsByName('nameMenus')[0].value = menuId;
+        document.getElementsByName('note')[0].value = note;
+        document.getElementsByName('amount')[0].value = amount;
+        $("#nameMenus").val(menuId).trigger("change");
+    }
+</script>
 </body>
 
 </html>

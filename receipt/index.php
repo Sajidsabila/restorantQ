@@ -64,8 +64,7 @@ $query = mysqli_query($db, $sql);
                                         onclick="return confirm('Anda yakin menghapus data ini?');"
                                         class="btn btn-danger btn-sm">Delete</button>
                                 </form>
-                                <a href="add.php?id=<?= $data['receipt_id']; ?>"
-                                    class="btn btn-warning btn-sm ms-2">Edit</a>
+                                <a href="add.php?id=<?= $data['id']; ?>" class="btn btn-warning btn-sm ms-2">Edit</a>
                         </td>
         </div>
         </tr>
