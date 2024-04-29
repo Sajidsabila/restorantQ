@@ -1,8 +1,7 @@
 <?php include ("../layout/header.php"); ?>
 <?php
 $id = isset($_GET['id']) ? $_GET['id'] : 0;
-$query = "SELECT menus.*, categories.id as id, menus.category_id FROM 
-menus join categories on menus.category_id = categories.id where menus.id = '$id'";
+$query = "SELECT * from menus where id = '$id'";
 $sql = mysqli_query($db, $query);
 $data = $sql->num_rows > 0 ? mysqli_fetch_assoc($sql) : null;
 ?>
@@ -43,7 +42,7 @@ $data = $sql->num_rows > 0 ? mysqli_fetch_assoc($sql) : null;
 
                             if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
-                                    $selected = ($row['name'] == $data['category_id']) ? 'selected' : '';
+                                    $selected = ($data['category_id'] == $row['categories_id']) ? 'selected' : '';
                                     echo '<option value="' . $row['categories_id'] . '" "' . $selected . '">' . $row['name'] . '</option>';
                                 }
                             } else {

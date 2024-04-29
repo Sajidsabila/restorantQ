@@ -21,11 +21,13 @@ if (isset($_POST['simpan'])) {
      VALUES ('$user_id', '$name', '$status', Now())";
 
         }
+
         $result = mysqli_query($db, $sql);
         if ($result) {
-            header("Location: add.php?success=eksekusi suksess");
+
+            header("Location: add.php?success=eksekusi suksess&recipt_id= " . "&id=$id");
         } else {
-            header("Location: add.php?error=error_add");
+            header("Location: add.php?error=error_add" . "&id=$id");
 
         }
     } catch (Exception $exception) {

@@ -2,11 +2,9 @@
 include ("../layout/header.php");
 $id = $_SESSION['user_id'];
 $sql = "select r.id , rd.id as receipt_id,  r.receipt_date, r.customer_name, 
-concat('Rp ', format(sum(rd.price * rd.amount), 0)), concat('Rp ', format(sum(rd.price * rd.amount), 0))
-  as total, r.status, 
-u.name from receipts as r join receipt_details as rd on rd.receipt_id=r.id 
-join users as u on r.user_id=u.id join menus as m on rd.menu_id=m.id 
-where u.id = '$id' group by r.id order by rd.id desc ";
+ concat('Rp ',  format(ifnull(sum(rd.price * rd.amount), 0), 0))
+  as total, r.status, u.name  FROM receipts r inner join users u on u.id = r.user_id
+left join receipt_details rd on r.id=rd.receipt_id where year(r.receipt_date) = '2024' group by r.id order by r.id desc";
 $query = mysqli_query($db, $sql);
 ?>
 <div class="container" style="margin: 100px;">
@@ -53,7 +51,7 @@ $query = mysqli_query($db, $sql);
                     ?>
                     <tr>
                         <td><?php echo $no++; ?></td>
-                        <td><?php echo $data['receipt_date'] ?></td>
+                        <td><?php echo date("d-m-Y H:i:s", strtotime($data['receipt_date'])) ?></td>
                         <td><?php echo $data['customer_name'] ?></td>
                         <td><?php echo $data['total']; ?></td>
                         <td><?php echo $data['status']; ?></td>

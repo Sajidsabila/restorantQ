@@ -1,7 +1,10 @@
 <?php include ("../layout/header.php");
 
 $id = isset($_GET['id']) ? $_GET['id'] : 0;
-
+$query_get_receipts = "SELECT * from receipts inner join receipt_details
+ on receipts.id = receipt_details.receipt_id where receipt_details.id = '$id'";
+$sql = mysqli_query($db, $query_get_receipts);
+$data = $sql->num_rows > 0 ? mysqli_fetch_assoc($sql) : null;
 ?>
 
 <div class="container" style="margin-top: 100px;">
@@ -27,7 +30,6 @@ $id = isset($_GET['id']) ? $_GET['id'] : 0;
         ?>
 
         <?php
-        $receipts_id = isset($_GET['receipt_id']) ? $_GET['receipt_id'] : 0;
         $sql = "select rd.id, m.name, rd.id, rd.receipt_id, m.name as menu, c.name as categori, 
         rd.note, concat('Rp ', format(sum(rd.price),0 )) as price, rd.amount, 
         concat('Rp ', format(sum(rd.price * rd.amount), 0)) 
@@ -35,27 +37,18 @@ $id = isset($_GET['id']) ? $_GET['id'] : 0;
          as rd on rd.receipt_id=r.id join users as u 
          on r.user_id=u.id join menus as m on
           rd.menu_id=m.id join categories as c on m.category_id=c.id WHERE
-           r.id = (SELECT max(r.id) from receipts as r ) or rd.id = '$receipts_id' group by rd.menu_id;;";
+           r.id = (SELECT max(r.id) from receipts as r ) group by rd.menu_id;;";
         $query = mysqli_query($db, $sql);
         ?>
         <div class="form ">
 
-            <?php include ("form.php"); ?>
-            <?php
-
-            $query_get = "select rd.id, m.name, rd.id, rd.receipt_id, m.name as menu, c.name as categori, 
-        rd.note, concat('Rp ', format(sum(rd.price),0 )) as price, rd.amount, 
-        concat('Rp ', format(sum(rd.price * rd.amount), 0)) 
-        as total from receipts as r join receipt_details
-         as rd on rd.receipt_id=r.id join users as u 
-         on r.user_id=u.id join menus as m on
-          rd.menu_id=m.id join categories as c on m.category_id=c.id WHERE rd.id = '$receipts_id' group by rd.menu_id";
-            $sql = mysqli_query($db, $query_get);
-            $data = $sql->num_rows > 0 ? mysqli_fetch_assoc($sql) : null;
+            <?php include ("form.php");
+            $id = isset($_GET['id']) ? $_GET['id'] : 0;
             ?>
+
         </div>
-        <div id="data" style="display: <?= $receipts_id ? 'block' : 'none'; ?>">
-            <h3 class="text-center mt-3">Data Recipt </h3>
+        <div id="data">
+            <h3 class="text-center mt-3">Details Pesanan</h3>
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-primary col-1" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Add
@@ -84,7 +77,6 @@ $id = isset($_GET['id']) ? $_GET['id'] : 0;
                         <div class="modal-body">
                             <form action="post_process_details.php" method="post">
                                 <input type="hidden" name="id_receipts" value=<?= $data_id_receipts['id']; ?>>
-
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Nama Menu</label>
                                     <select name="nameMenus" class="form-control">
@@ -144,76 +136,160 @@ $id = isset($_GET['id']) ? $_GET['id'] : 0;
                 </thead>
                 <tbody>
                     <?php
-                    $no = 1;
-                    while ($data = mysqli_fetch_array($query)) {
+                    if (isset($_GET['id'])) {
+                        $id = $_GET['id'];
+                        $sql = "select rd.id, m.name, rd.id, rd.receipt_id, m.name as menu, c.name as categori,
+                    rd.note, concat('Rp ', format(sum(rd.price),0 )) as price, rd.amount,
+                    concat('Rp ', format(sum(rd.price * rd.amount), 0))
+                    as total from receipts as r join receipt_details
+                    as rd on rd.receipt_id=r.id join users as u
+                    on r.user_id=u.id join menus as m on
+                    rd.menu_id=m.id join categories as c on m.category_id=c.id WHERE
+                    rd.id = '$id' group by rd.menu_id;;";
+                        $no = 1;
+                        $query = mysqli_query($db, $sql);
 
-                        ?>
-                        <tr>
-                            <td><?php echo $no++; ?></td>
-                            <td><?php echo $data['name'] ?></td>
-                            <td><?php echo $data['categori'] ?></td>
-                            <td><?php echo $data['note']; ?></td>
-                            <td><?php echo $data['price']; ?></td>
-                            <td><?php echo $data['amount']; ?></td>
-                            <td><?php echo $data['total']; ?></td>
-                            <td>
-                                <div class="d-flex">
-                                    <form action="delete_details.php" method="post">
-                                        <input type="hidden" name="id" value="<?= $data["id"]; ?>">
-                                        <button type="submit" name="submit"
-                                            onclick="return confirm('Anda yakin menghapus data ini?');"
-                                            class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
-                                    <a href="add.php?id=<?= $data['id']; ?>" class="btn btn-warning btn-sm ms-2">Edit</a>
-                            </td>
-            </div>
-            </tr>
-            <?php
+                        if ($query && mysqli_num_rows($query) > 0) {
+                            $data = mysqli_fetch_assoc($query);
+                            '<tr>';
+                            echo '<td>' . $no++ . '</td>';
+                            echo '<td>' . $data['name'] . '</td>';
+                            echo '<td>' . $data['categori'] . '</td>';
+                            echo '<td>' . $data['note'] . '</td>';
+                            echo '<td>' . $data['price'] . '</td>';
+                            echo '<td>' . $data['amount'] . '</td>';
+                            echo '<td>' . $data['total'] . '</td>';
+                            echo '<td>
+                             <div class="d-flex">
+                                <form action="delete_details.php.php" method="post">
+                                    <input type="hidden" name="id" value=' . $data['id'] . '>
+                                    <button type="submit" 
+                                    name="submit" onclick="return confirm("Anda yakin menghapus data ini?");"
+                                    class="btn btn-danger btn-sm" value="Edit">Hapus</button>
+                                </form>
+                                <a href="form.php?id= ' . $data["id"] . '" class="btn btn-warning btn-sm ms-2">Edit</a>
+                            </div>
+                            </td>';
+                            '</tr>';
+                        } else {
+                            echo "Data tidak ditemukan.";
+                        }
+                    } else {
+                        $sql = "select rd.id, m.name, rd.id, rd.receipt_id, m.name as menu, c.name as categori, 
+                                rd.note, concat('Rp ', format(sum(rd.price),0 )) as price, rd.amount, 
+                                concat('Rp ', format(sum(rd.price * rd.amount), 0)) 
+                                as total from receipts as r join receipt_details
+                                as rd on rd.receipt_id=r.id join users as u 
+                                on r.user_id=u.id join menus as m on
+                                rd.menu_id=m.id join categories as c on m.category_id=c.id WHERE
+                                r.id = (SELECT max(r.id) from receipts as r ) group by rd.menu_id";
+                        $no = 1;
+                        $query = mysqli_query($db, $sql);
+                        if ($query && mysqli_num_rows($query) > 0) {
+                            while ($data = mysqli_fetch_assoc($query)) {
+                                echo '<tr>';
+                                echo '<td>' . $no++ . '</td>';
+                                echo '<td>' . $data['name'] . '</td>';
+                                echo '<td>' . $data['categori'] . '</td>';
+                                echo '<td>' . $data['note'] . '</td>';
+                                echo '<td>' . $data['price'] . '</td>';
+                                echo '<td>' . $data['amount'] . '</td>';
+                                echo '<td>' . $data['total'] . '</td>';
+                                echo '<td>
+                             <div class="d-flex">
+                                <form action="delete_details.php" method="post">
+                                    <input type="hidden" name="id" value=' . $data['id'] . '>
+                                    <button type="submit" 
+                                    name="submit" onclick="return confirm("Anda yakin menghapus data ini?");"
+                                    class="btn btn-danger btn-sm" value="Edit">Hapus</button>
+                                </form>
+                                <a href="form.php?id= ' . $data["id"] . '" class="btn btn-warning btn-sm ms-2">Edit</a>
+                            </div>
+                            </td>';
+                                '</tr>';
+                                '</tr>';
+                            }
+                        } else {
+                            echo "tidak ditemukan";
+                        }
                     }
                     ?>
-        <tr>
-            <td>Total :</td>
-            <?php
-            error_reporting();
-            $sql1 = "select rd.receipt_id,
-             concat('Rp ', format(sum(rd.price * rd.amount), 0)) as 
-             total_tagihan from receipts as r join receipt_details as rd on 
-             rd.receipt_id=r.id join users as u on r.user_id=u.id join menus as m on rd.menu_id=m.id join categories as c on m.category_id=c.id WHERE r.id = (SELECT max(id) from receipts as r ) group by r.id";
-            $query1 = mysqli_query($db, $sql1);
-            if ($query1) {
-                if (mysqli_num_rows($query1) > 0) {
-                    while ($row = mysqli_fetch_assoc($query1)) {
-                        echo "<td></td>";
-                        echo "<td></td>";
-                        echo "<td></td>";
-                        echo "<td></td>";
-                        echo "<td></td>";
-                        echo "<td>" . $row['total_tagihan'] . "</td>";
-                    }
-                } else {
-                    echo "<td></td>";
-                    echo "<td></td>";
-                    echo "<td></td>";
-                    echo "<td></td>";
-                    echo "<td></td>";
-                    echo "<td>0</td>";
-                }
-            } else {
-                echo "Error: " . mysqli_error($koneksi);
-            }
-            ?>
-        </tr>
-        </tbody>
-        </table>
+                    <tr>
+                        <td>Total :</td>
+                        <?php
+
+                        if (isset($_GET['id'])) {
+                            $id = $_GET['id'];
+                            $sql1 = "select rd.id,  rd.receipt_id,
+                                concat('Rp ', format(sum(rd.price * rd.amount), 0)) as 
+                                total_tagihan from receipts as r join receipt_details as rd on 
+                                rd.receipt_id=r.id join users as u on 
+                                r.user_id=u.id join menus as m on rd.menu_id=m.id 
+                                
+                                join categories as c on m.category_id=c.id where  rd.id = '$id'";
+                            $query1 = mysqli_query($db, $sql1);
+                            if ($query1) {
+                                if (mysqli_num_rows($query1) > 0) {
+                                    while ($row = mysqli_fetch_assoc($query1)) {
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td>" . $row['total_tagihan'] . "</td>";
+                                    }
+                                } else {
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td>0</td>";
+                                }
+                            } else {
+                                echo "gagal ";
+                            }
+                        } else {
+                            $sql1 = "select rd.receipt_id,
+                                concat('Rp ', format(sum(rd.price * rd.amount), 0)) as 
+                                total_tagihan from receipts as r join receipt_details as rd on 
+                                rd.receipt_id=r.id join users as u on 
+                                r.user_id=u.id join menus as m on rd.menu_id=m.id 
+                                
+                                join categories as c on m.category_id=c.id WHERE r.id = (SELECT max(id) from receipts as r ) group by r.id";
+                            $query1 = mysqli_query($db, $sql1);
+                            if ($query1) {
+                                if (mysqli_num_rows($query1) > 0) {
+                                    while ($row = mysqli_fetch_assoc($query1)) {
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td></td>";
+                                        echo "<td>" . $row['total_tagihan'] . "</td>";
+                                    }
+                                } else {
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td>0</td>";
+                                }
+                            } else {
+                                echo "gagal ";
+                            }
+                        }
+
+
+                        ?>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-</div>
-<script>
-    document.getElementById('receipt').addEventListener('submit', function (e) {
-        e.preventDefault();
-        document.getElementById('data').style.display = 'block';
-    });
-</script>
+
 <?php
 include ("../layout/footer.php");
 ?>
